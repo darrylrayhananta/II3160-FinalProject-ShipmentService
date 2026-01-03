@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  shipment-service:
+    build: .
+    container_name: shipment_app
+    ports:
+      - "8001:8001"
+    environment:
+      - AUTH_TOKEN=RahasiaTST2026 
+    deploy:
+      resources:
+        limits:
+          memory: 512M 
+    restart: always
