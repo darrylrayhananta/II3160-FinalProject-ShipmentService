@@ -8,7 +8,7 @@ load_dotenv()
 class ShippingService:
     def __init__(self):
         self.repo = ShipmentRepository()
-        self.WAREHOUSE_URL = "http://127.0.0.1:8000/api/packages/"
+        self.WAREHOUSE_URL = os.getenv("WAREHOUSE_URL")
         token = os.getenv("WAREHOUSE_API_TOKEN")
         self.HEADERS = {"Authorization": f"Bearer {token}"}
 
