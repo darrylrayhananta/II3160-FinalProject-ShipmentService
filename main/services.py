@@ -1,28 +1,29 @@
-import requests
-import uuid
+import requests, uuid
 from .repositories import ShipmentRepository
+import os
 
 class ShippingService:
     def __init__(self):
         self.repo = ShipmentRepository()
         self.WAREHOUSE_URL = "http://127.0.0.1:8000/api/packages/"
+        token = os.getenv("WAREHOUSE_API_TOKEN")
+        self.HEADERS = {"Authorization": f"Bearer {token}"}
 
-    def initiate_shipment(self, package_id, courier_name): 
-        try: 
-            response = requests.get(self.WAREHOUSE_URL)
-            all_packages = response.json()
-             
-            package_exists = any(p['id'] == package_id for p in all_packages)
-            
-            if not package_exists:
-                return {"error": "Barang tidak ditemukan di Warehouse!"}
- 
+    def initiate_shipment(self, package_id, courier_name):
+        try:
+            res = requests.get(f"{self.WAREHOUSE_URL}{package_id}/")
+            if res.status_code != 200:
+                return {"error": "Package not found in Warehouse"}
+
             shipment_data = {
                 "package_id": package_id,
                 "courier_name": courier_name,
-                "tracking_number": f"TRX-{uuid.uuid4().hex[:8].upper()}"
+                "tracking_number": f"TRX-{uuid.uuid4().hex[:6].upper()}"
             }
-            return self.repo.create_shipment(shipment_data)
+            new_shipment = self.repo.create_shipment(shipment_data)
 
-        except requests.exceptions.ConnectionError:
-            return {"error": "Gagal konek ke Warehouse Service (Repo 1 mati?)"}
+            requests.patch(f"{self.WAREHOUSE_URL}{package_id}/", json={"status": "SHIPPED"})
+
+            return new_shipment
+        except Exception as e:
+            return {"error": str(e)}
