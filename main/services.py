@@ -18,7 +18,13 @@ class ShippingService:
             
             res = requests.get(f"{self.WAREHOUSE_URL}{package_id}/", headers=headers)
             if res.status_code != 200:
-                return {"error": "Package not found in Warehouse"}
+                shipment_data = {
+                    "package_id": package_id,
+                    "courier_name": courier_name,
+                    "tracking_number": f"TRX-{uuid.uuid4().hex[:6].upper()}"
+                }
+                new_shipment = self.repo.create_shipment(shipment_data)
+                return new_shipment
 
             shipment_data = {
                 "package_id": package_id,
