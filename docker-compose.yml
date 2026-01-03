@@ -1,14 +1,25 @@
 version: '3.8'
 services:
-  shipment-service:
+  warehouse-service:
     build: .
-    container_name: shipment_app
+    container_name: warehouse_app
     ports:
-      - "8001:8001"
+      - "8000:8000"
+    env_file: .env
     environment:
-      - AUTH_TOKEN=RahasiaTST2026 
+      - PYTHONUNBUFFERED=1
     deploy:
       resources:
         limits:
-          memory: 512M 
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
     restart: always
+    networks:
+      - tst-network
+
+networks:
+  tst-network:
+    external: true 

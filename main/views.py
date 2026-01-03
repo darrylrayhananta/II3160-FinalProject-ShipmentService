@@ -1,11 +1,26 @@
 import json
+import os
+import functools
+from dotenv import load_dotenv
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .services import ShippingService
 
 service = ShippingService()
+load_dotenv()
+API_TOKEN = os.getenv("WAREHOUSE_API_TOKEN")
+
+def token_required(view_func):
+    @functools.wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if auth_header == f"Bearer {API_TOKEN}":
+            return view_func(request, *args, **kwargs)
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    return wrapper
 
 @csrf_exempt
+@token_required
 def shipment_list_create(request):
     if request.method == 'GET':
         shipments = service.repo.get_all_shipments()
@@ -19,7 +34,6 @@ def shipment_list_create(request):
         )
         
         if isinstance(result, dict) and "error" in result:
-            print(result)
             return JsonResponse(result, status=400)
             
         return JsonResponse({
@@ -29,6 +43,7 @@ def shipment_list_create(request):
         }, status=201)
         
 @csrf_exempt
+@token_required
 def shipment_detail(request, pk):
     if request.method == 'GET':
         shipment = service.repo.get_shipment_by_id(pk)
