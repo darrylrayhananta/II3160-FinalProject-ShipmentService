@@ -19,6 +19,7 @@ def shipment_list_create(request):
         )
         
         if isinstance(result, dict) and "error" in result:
+            print(result)
             return JsonResponse(result, status=400)
             
         return JsonResponse({
@@ -33,21 +34,25 @@ def shipment_detail(request, pk):
         shipment = service.repo.get_shipment_by_id(pk)
         if shipment:
             return JsonResponse({
+                "id": shipment.id,
                 "tracking_number": shipment.tracking_number,
-                "courier": shipment.courier_name,
-                "current_location": shipment.current_location,
                 "status": shipment.status,
-                "last_update": shipment.updated_at
+                "current_location": shipment.current_location,
+                "courier": shipment.courier_name
             })
-        return JsonResponse({"error": "Resi tidak ditemukan"}, status=404)
+        return JsonResponse({"error": "Not Found"}, status=404)
 
     elif request.method == 'PATCH':
         body = json.loads(request.body)
-        new_location = body.get('location')
-        updated = service.repo.update_location(pk, new_location)
-        if updated:
-            return JsonResponse({
-                "message": "Lokasi diperbarui",
-                "new_location": updated.current_location
-            })
-        return JsonResponse({"error": "Gagal update"}, status=404)
+        shipment = service.repo.get_shipment_by_id(pk)
+        
+        if shipment:
+            if 'location' in body:
+                shipment.current_location = body['location']
+            if 'status' in body:
+                shipment.status = body['status']
+                
+            shipment.save()
+            return JsonResponse({"message": "Status Updated", "status": shipment.status})
+        
+        return JsonResponse({"error": "Failed to update"}, status=404)

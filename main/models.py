@@ -7,4 +7,4 @@ class Shipment(models.Model):
     status = models.CharField(max_length=50, default='IN_TRANSIT')
     current_location = models.CharField(max_length=255, default='Warehouse Origin') 
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) # Biar tau kapan terakhir update lokasinya
+    updated_at = models.DateTimeField(auto_now=True) 

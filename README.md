@@ -18,7 +18,7 @@ Shipment Service merupakan *core subdomain* yang mengorkestrasi proses logistik.
 
 ### 🚀 Cara Menjalankan (Local)
 1. Install dependencies: `pip install -r requirements.txt`
-2. Konfigurasi `.env`: Masukkan `WAREHOUSE_API_TOKEN` dan `WAREHOUSE_URL`.
+2. Konfigurasi `.env`: Masukkan `WAREHOUSE_API_TOKEN` dan `WAREHOUSE_URL` dan kunci database `DATABASE_URL`.
 3. Jalankan migrasi: `python manage.py migrate`
 4. Jalankan server: `python manage.py runserver 8001`
 

@@ -16,6 +16,10 @@ class ShipmentRepository:
     @staticmethod
     def get_shipment_by_id(shipment_id):
         return Shipment.objects.filter(id=shipment_id).first()
+    
+    @staticmethod
+    def get_shipment_by_resi(resi):
+        return Shipment.objects.filter(tracking_number=resi).first()
 
     @staticmethod
     def update_location(shipment_id, new_location):
